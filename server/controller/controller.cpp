@@ -9,9 +9,16 @@
 
 using namespace std;
 
+struct MsgData {
+	uint16_t receiver;
+	uint16_t sender;
+	string msg;
+};
+
 Parser prs;
 map<string,Controller::handler> handlers;
 int connectionsNumber = 0;
+vector<MsgData> messagesDataBase;
 
 void Controller::handleServerConnection(uint16_t fd)
 {
@@ -23,6 +30,24 @@ void Controller::handleServerDisconnect(uint16_t fd)
 {
 	cout << "Controller: got disconnect from " << fd << endl;
 	connectionsNumber--;
+}
+
+void getMessage(uint16_t fd, uint16_t &senderFd, string &msg) {
+	int postion = -1;
+	int idx = 0;
+	for (const MsgData msg_data : messagesDataBase) {
+		if (msg_data.receiver == fd) {
+			msg = msg_data.msg;
+			senderFd = msg_data.sender;
+			postion = idx;
+			break;
+		}
+		idx++;
+	}
+    	
+	if (postion >= 0) {
+		messagesDataBase.erase(messagesDataBase.begin() + postion);
+	}
 }
 
 void Controller::handleServerInput(uint16_t fd, char *buffer)
@@ -54,6 +79,24 @@ void Controller::handleServerInput(uint16_t fd, char *buffer)
 		sprintf(buf, "connectionsNumber: %d", connectionsNumber);
 	} else if (key == "parse" && prs.values.size() == 2) {
 		sprintf(buf, "parsedString: %d", prs.values.at(1).size());
+	} else if (key == "put" && prs.values.size() == 3) {
+		uint16_t recieverFd = stoi(prs.values.at(1));
+		MsgData msgData;
+		msgData.msg = prs.values.at(2);
+		msgData.sender = fd;
+		msgData.receiver  = recieverFd;
+		messagesDataBase.push_back(msgData);
+		sprintf(buf, "message sent to %d", recieverFd);
+	} else if (key == "get") {
+		// uint16_t senderFd = stoi(prs.values.at(1));
+		uint16_t senderFd = 0;
+		string msg = "";
+		getMessage(fd, senderFd, msg);
+		if (!msg.empty()) {
+			sprintf(buf, "new msg from %d: %s", senderFd, msg.c_str());
+		} else {
+			sprintf(buf, "no messages");
+		}
 	} else {
 		sprintf(buf, "not valid request");
 	}
