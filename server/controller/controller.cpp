@@ -52,15 +52,19 @@ void getMessage(uint16_t fd, uint16_t &senderFd, string &msg) {
 
 string getStringStats(string input) {
 	string result = "";
-	uint16_t countLetters[100] = {0};
+	map<char, uint16_t> countLetters;
+	
 	for (int i = 0; i < input.length(); i++) {
 		char c = input[i];
 		if (c < 'A' || c > 'z') continue;
-		countLetters[c-'A'] += 1;
+		if (!countLetters.count(c)) {
+			countLetters[c] = 1;
+		} else {
+			countLetters[c] += 1;
+		}
 	}
-	for (int i = 0; i < input.length(); i++) {
-		char c = input[i];
-		result = result + input[i] + to_string(countLetters[c-'A']);	
+	for (auto const& [key, val] : countLetters) {
+		result = result + key + to_string(val);
 	}
 	return result;
 }
