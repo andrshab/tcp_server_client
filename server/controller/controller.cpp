@@ -50,6 +50,21 @@ void getMessage(uint16_t fd, uint16_t &senderFd, string &msg) {
 	}
 }
 
+string getStringStats(string input) {
+	string result = "";
+	uint16_t countLetters[100] = {0};
+	for (int i = 0; i < input.length(); i++) {
+		char c = input[i];
+		if (c < 'A' || c > 'z') continue;
+		countLetters[c-'A'] += 1;
+	}
+	for (int i = 0; i < input.length(); i++) {
+		char c = input[i];
+		result = result + input[i] + to_string(countLetters[c-'A']);	
+	}
+	return result;
+}
+
 void Controller::handleServerInput(uint16_t fd, char *buffer)
 {
 	cout << "Controller: got input '" << buffer << "'from " << fd << endl;
@@ -78,7 +93,7 @@ void Controller::handleServerInput(uint16_t fd, char *buffer)
 	if (key == "connectionsNumber") {
 		sprintf(buf, "connectionsNumber: %d", connectionsNumber);
 	} else if (key == "parse" && prs.values.size() == 2) {
-		sprintf(buf, "parsedString: %d", prs.values.at(1).size());
+		sprintf(buf, "parsedString: %s", getStringStats(prs.values.at(1)).c_str());
 	} else if (key == "put" && prs.values.size() == 3) {
 		uint16_t recieverFd = stoi(prs.values.at(1));
 		MsgData msgData;
