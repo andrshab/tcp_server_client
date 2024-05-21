@@ -4,14 +4,11 @@ CFLAGS = -g -std=gnu++17
 CFLAGS_OBJ = $(CFLAGS) -c
 CFLAGS_BUILD = $(CFLAGS) -o main
 
-main: main.o actions.o controller.o Server.o parser.o
+main: main.o controller.o Server.o parser.o
 	$(CC) $(CFLAGS_BUILD) *.o
 
 main.o:
 	$(CC) $(CFLAGS_OBJ) main.cpp
-
-actions.o:
-	$(CC) $(CFLAGS_OBJ) controller/actions.cpp
 
 controller.o:
 	$(CC) $(CFLAGS_OBJ) controller/controller.cpp
