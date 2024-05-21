@@ -11,6 +11,13 @@ make
 ./main
 ```
 
+При подключении клиентов в логах сообщения:
+
+```
+Controller: got connect from 4
+Controller: got connect from 5
+```
+
 
 ## Сlient
 
