@@ -1,16 +1,3 @@
-/*
- * Server.cpp
- *
- * EventServer is a simple C++ TCP socket server implementation,
- * built to simplify socket programming (and to serve as an example to anyone who wants to learn it!)
- * It can interface with the rest of your program using three callback functions.
- * - onConnect, which fires when a new client connects. the client's fd is passed.
- * - onDisconnect, which fires when a client disconnects. passes fd.
- * - onInput, fires when input is received from a client. passes fd and char*
- *
- * define SERVER_DEBUG to spew out some juicy debug data!
- */
-
 #include "Server.hpp"
 
 Server::Server()
@@ -29,9 +16,6 @@ Server::Server(const Server &orig)
 
 Server::~Server()
 {
-#ifdef SERVER_DEBUG
-	std::cout << "[SERVER] [DESTRUCTOR] Destroying Server...\n";
-#endif
 	close(mastersocket_fd);
 }
 
@@ -56,14 +40,8 @@ void Server::setup(int port)
 
 void Server::initializeSocket()
 {
-#ifdef SERVER_DEBUG
-	std::cout << "[SERVER] initializing socket\n";
-#endif
 	int opt_value = 1;
 	int ret_test = setsockopt(mastersocket_fd, SOL_SOCKET, SO_REUSEADDR, (char *)&opt_value, sizeof(int));
-#ifdef SERVER_DEBUG
-	printf("[SERVER] setsockopt() ret %d\n", ret_test);
-#endif
 	if (ret_test < 0)
 	{
 		perror("[SERVER] [ERROR] setsockopt() failed");
@@ -73,13 +51,7 @@ void Server::initializeSocket()
 
 void Server::bindSocket()
 {
-#ifdef SERVER_DEBUG
-	std::cout << "[SERVER] binding...\n";
-#endif
 	int bind_ret = bind(mastersocket_fd, (struct sockaddr *)&servaddr, sizeof(servaddr));
-#ifdef SERVER_DEBUG
-	printf("[SERVER] bind() ret %d\n", bind_ret);
-#endif
 	if (bind_ret < 0)
 	{
 		perror("[SERVER] [ERROR] bind() failed");
@@ -90,13 +62,7 @@ void Server::bindSocket()
 
 void Server::startListen()
 {
-#ifdef SERVER_DEBUG
-	std::cout << "[SERVER] listen starting...\n";
-#endif
 	int listen_ret = listen(mastersocket_fd, 3);
-#ifdef SERVER_DEBUG
-	printf("[SERVER] listen() ret %d\n", listen_ret);
-#endif
 	if (listen_ret < 0)
 	{
 		perror("[SERVER] [ERROR] listen() failed");
@@ -106,16 +72,10 @@ void Server::startListen()
 void Server::shutdown()
 {
 	int close_ret = close(mastersocket_fd);
-#ifdef SERVER_DEBUG
-	printf("[SERVER] [DEBUG] [SHUTDOWN] closing master fd..  ret '%d'.\n", close_ret);
-#endif
 }
 
 void Server::handleNewConnection()
 {
-#ifdef SERVER_DEBUG
-	std::cout << "[SERVER] [CONNECTION] handling new connection\n";
-#endif
 	socklen_t addrlen = sizeof(client_addr);
 	tempsocket_fd = accept(mastersocket_fd, (struct sockaddr *)&client_addr, &addrlen);
 
@@ -130,13 +90,7 @@ void Server::handleNewConnection()
 		if (tempsocket_fd > maxfd)
 		{
 			maxfd = tempsocket_fd;
-#ifdef SERVER_DEBUG
-			std::cout << "[SERVER] incrementing maxfd to " << maxfd << std::endl;
-#endif
 		}
-#ifdef SERVER_DEBUG
-		printf("[SERVER] [CONNECTION] New connection on socket fd '%d'.\n", tempsocket_fd);
-#endif
 	}
 	newConnectionCallback(tempsocket_fd); // call the callback
 }
@@ -162,23 +116,14 @@ void Server::recvInputFromExisting(int fd)
 		FD_CLR(fd, &masterfds); // clear the client fd from fd set
 		return;
 	}
-#ifdef SERVER_DEBUG
-	printf("[SERVER] [RECV] Received '%s' from client!\n", input_buffer);
-#endif
 	receiveCallback(fd, input_buffer);
-	// memset(&input_buffer, 0, INPUT_BUFFER_SIZE); //zero buffer //bzero
 	bzero(&input_buffer, INPUT_BUFFER_SIZE); // clear input buffer
 }
 
 void Server::loop()
 {
 	tempfds = masterfds; // copy fd_set for select()
-#ifdef SERVER_DEBUG
-	printf("[SERVER] [MISC] max fd = '%hu' \n", maxfd);
-	std::cout << "[SERVER] [MISC] calling select()\n";
-#endif
 	int sel = select(maxfd + 1, &tempfds, NULL, NULL, NULL); // blocks until activity
-	// printf("[SERVER] [MISC] select() ret %d, processing...\n", sel);
 	if (sel < 0)
 	{
 		perror("[SERVER] [ERROR] select() failed");

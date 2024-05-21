@@ -5,5 +5,4 @@
 
 extern Server server;
 
-// extern EventHandler
 #endif // COMMONS_H

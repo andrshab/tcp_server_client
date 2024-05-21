@@ -1,5 +1,3 @@
-// https://github.com/bozkurthan/Simple-TCP-Server-Client-CPP-Example
-
 #include <iostream>
 #include <string>
 #include <stdio.h>
@@ -18,23 +16,19 @@
 #include <fstream>
 #include <unistd.h>
 using namespace std;
-// Client side
-//  g++ client.cpp -o client
+
 int main(int argc, char *argv[])
 {
     while (1)
     {
-        // we need 2 things: ip address and port number, in that order
         if (argc != 3)
         {
             cerr << "Usage: ip_address port" << endl;
             exit(0);
-        } // grab the IP address and port number
+        }
         char *serverIp = argv[1];
         int port = atoi(argv[2]);
-        // create a message buffer
         char msg[1500];
-        // setup a socket and connection tools
         struct hostent *host = gethostbyname(serverIp);
         sockaddr_in sendSockAddr;
         bzero((char *)&sendSockAddr, sizeof(sendSockAddr));
@@ -49,7 +43,6 @@ int main(int argc, char *argv[])
         tv.tv_usec = 0;
         setsockopt(clientSd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof(tv));
 
-        // try to connect...
         int status = connect(clientSd,
                              (sockaddr *)&sendSockAddr, sizeof(sendSockAddr));
         if (status < 0)

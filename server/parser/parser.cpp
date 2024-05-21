@@ -1,9 +1,3 @@
-/*
- * parser.cpp
- * simple parser for gprpcd - function defenitions
- * original work by Gydo194
- */
-
 #include <iostream>
 #include <string>
 #include <sstream>

@@ -11,7 +11,6 @@ using namespace std;
 namespace Controller
 {
 	typedef void (*handler)(vector<string> *args);
-	//	map<string,handler> handlers;
 
 	void addHandler(string key, handler h);
 	void removeHandler(string key);
