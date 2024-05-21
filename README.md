@@ -70,3 +70,18 @@ Server: new msg from 4: hello1
 Awaiting server response...
 Server: no messages
 ```
+
+5. Если сервер недорступен то идут попытки подключиться
+
+```
+Error connecting to socket!
+Error connecting to socket!
+Error connecting to socket!
+Error connecting to socket!
+Error connecting to socket!
+Error connecting to socket!
+Connected to the server!
+>parse Hello
+Awaiting server response...
+Server: parsedString: H1e1l2o1
+```
