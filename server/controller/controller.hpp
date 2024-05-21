@@ -6,13 +6,12 @@
 #include <map>
 #include <vector>
 
-
 using namespace std;
 
 namespace Controller
 {
 	typedef void (*handler)(vector<string> *args);
-//	map<string,handler> handlers;
+	//	map<string,handler> handlers;
 
 	void addHandler(string key, handler h);
 	void removeHandler(string key);
@@ -24,4 +23,4 @@ namespace Controller
 	void handleRequest(string name);
 }
 
-#endif //CONTROLLER_H header guard
+#endif // CONTROLLER_H header guard

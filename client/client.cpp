@@ -1,4 +1,4 @@
-//https://github.com/bozkurthan/Simple-TCP-Server-Client-CPP-Example
+// https://github.com/bozkurthan/Simple-TCP-Server-Client-CPP-Example
 
 #include <iostream>
 #include <string>
@@ -18,40 +18,43 @@
 #include <fstream>
 #include <unistd.h>
 using namespace std;
-//Client side
-// g++ client.cpp -o client
+// Client side
+//  g++ client.cpp -o client
 int main(int argc, char *argv[])
 {
-    while(1) {
-        //we need 2 things: ip address and port number, in that order
-        if(argc != 3)
+    while (1)
+    {
+        // we need 2 things: ip address and port number, in that order
+        if (argc != 3)
         {
-            cerr << "Usage: ip_address port" << endl; exit(0); 
-        } //grab the IP address and port number 
-        char *serverIp = argv[1]; int port = atoi(argv[2]); 
-        //create a message buffer 
-        char msg[1500]; 
-        //setup a socket and connection tools 
-        struct hostent* host = gethostbyname(serverIp); 
-        sockaddr_in sendSockAddr;   
-        bzero((char*)&sendSockAddr, sizeof(sendSockAddr)); 
-        sendSockAddr.sin_family = AF_INET; 
-        sendSockAddr.sin_addr.s_addr = 
-            inet_addr(inet_ntoa(*(struct in_addr*)*host->h_addr_list));
+            cerr << "Usage: ip_address port" << endl;
+            exit(0);
+        } // grab the IP address and port number
+        char *serverIp = argv[1];
+        int port = atoi(argv[2]);
+        // create a message buffer
+        char msg[1500];
+        // setup a socket and connection tools
+        struct hostent *host = gethostbyname(serverIp);
+        sockaddr_in sendSockAddr;
+        bzero((char *)&sendSockAddr, sizeof(sendSockAddr));
+        sendSockAddr.sin_family = AF_INET;
+        sendSockAddr.sin_addr.s_addr =
+            inet_addr(inet_ntoa(*(struct in_addr *)*host->h_addr_list));
         sendSockAddr.sin_port = htons(port);
         int clientSd = socket(AF_INET, SOCK_STREAM, 0);
 
         struct timeval tv;
         tv.tv_sec = 1;
         tv.tv_usec = 0;
-        setsockopt(clientSd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv));
+        setsockopt(clientSd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof(tv));
 
-        //try to connect...
+        // try to connect...
         int status = connect(clientSd,
-                            (sockaddr*) &sendSockAddr, sizeof(sendSockAddr));
-        if(status < 0)
+                             (sockaddr *)&sendSockAddr, sizeof(sendSockAddr));
+        if (status < 0)
         {
-            cout<<"Error connecting to socket!"<<endl;
+            cout << "Error connecting to socket!" << endl;
             sleep(1);
             continue;
         }
@@ -61,23 +64,24 @@ int main(int argc, char *argv[])
         int bytesWritten = 0;
         struct timeval start1, end1;
         gettimeofday(&start1, NULL);
-        while(1)
+        while (1)
         {
             cout << ">";
             string data;
             getline(cin, data);
-            memset(&msg, 0, sizeof(msg));//clear the buffer
+            memset(&msg, 0, sizeof(msg)); // clear the buffer
             strcpy(msg, data.c_str());
-            if(data == "exit")
+            if (data == "exit")
             {
-                send(clientSd, (char*)&msg, strlen(msg), 0);
+                send(clientSd, (char *)&msg, strlen(msg), 0);
                 break;
             }
-            bytesWritten += send(clientSd, (char*)&msg, strlen(msg), 0);
+            bytesWritten += send(clientSd, (char *)&msg, strlen(msg), 0);
             cout << "Awaiting server response..." << endl;
-            memset(&msg, 0, sizeof(msg));//clear the buffer
-            bytesReceived = recv(clientSd, (char*)&msg, sizeof(msg), 0);
-            if (bytesReceived < 1) {
+            memset(&msg, 0, sizeof(msg)); // clear the buffer
+            bytesReceived = recv(clientSd, (char *)&msg, sizeof(msg), 0);
+            if (bytesReceived < 1)
+            {
                 break;
             }
             cout << "Server: " << msg << endl;
@@ -85,12 +89,11 @@ int main(int argc, char *argv[])
         gettimeofday(&end1, NULL);
         close(clientSd);
         cout << "********Session********" << endl;
-        cout << "Bytes written: " << bytesWritten << 
-        " Bytes read: " << bytesRead << endl;
-        cout << "Elapsed time: " << (end1.tv_sec- start1.tv_sec) 
-        << " secs" << endl;
+        cout << "Bytes written: " << bytesWritten << " Bytes read: " << bytesRead << endl;
+        cout << "Elapsed time: " << (end1.tv_sec - start1.tv_sec)
+             << " secs" << endl;
         cout << "Connection closed" << endl;
     }
-    
-    return 0;    
+
+    return 0;
 }

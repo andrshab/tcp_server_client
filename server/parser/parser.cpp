@@ -14,7 +14,7 @@ using namespace std;
 
 void Parser::parse(char *buffer)
 {
-	parse((const char*)buffer);
+	parse((const char *)buffer);
 }
 
 void Parser::parse(const char *buffer)
@@ -23,7 +23,7 @@ void Parser::parse(const char *buffer)
 	istringstream iss(in);
 
 	string sub;
-	while(iss >> sub)
+	while (iss >> sub)
 	{
 		values.push_back(sub);
 	}

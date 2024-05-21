@@ -14,11 +14,11 @@ using namespace std;
 
 class Parser
 {
-	private:
-//		string input;
+private:
+	//		string input;
 
-	public:
-		vector<string> values;
-		void parse(char *buffer);
-		void parse(const char *buffer);
+public:
+	vector<string> values;
+	void parse(char *buffer);
+	void parse(const char *buffer);
 };

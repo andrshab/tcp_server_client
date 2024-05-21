@@ -9,14 +9,15 @@
 
 using namespace std;
 
-struct MsgData {
+struct MsgData
+{
 	uint16_t receiver;
 	uint16_t sender;
 	string msg;
 };
 
 Parser prs;
-map<string,Controller::handler> handlers;
+map<string, Controller::handler> handlers;
 int connectionsNumber = 0;
 vector<MsgData> messagesDataBase;
 
@@ -32,11 +33,14 @@ void Controller::handleServerDisconnect(uint16_t fd)
 	connectionsNumber--;
 }
 
-void getMessage(uint16_t fd, uint16_t &senderFd, string &msg) {
+void getMessage(uint16_t fd, uint16_t &senderFd, string &msg)
+{
 	int postion = -1;
 	int idx = 0;
-	for (const MsgData msg_data : messagesDataBase) {
-		if (msg_data.receiver == fd) {
+	for (const MsgData msg_data : messagesDataBase)
+	{
+		if (msg_data.receiver == fd)
+		{
 			msg = msg_data.msg;
 			senderFd = msg_data.sender;
 			postion = idx;
@@ -44,26 +48,34 @@ void getMessage(uint16_t fd, uint16_t &senderFd, string &msg) {
 		}
 		idx++;
 	}
-    	
-	if (postion >= 0) {
+
+	if (postion >= 0)
+	{
 		messagesDataBase.erase(messagesDataBase.begin() + postion);
 	}
 }
 
-string getStringStats(string input) {
+string getStringStats(string input)
+{
 	string result = "";
 	map<char, uint16_t> countLetters;
-	
-	for (int i = 0; i < input.length(); i++) {
+
+	for (int i = 0; i < input.length(); i++)
+	{
 		char c = input[i];
-		if (c < 'A' || c > 'z') continue;
-		if (!countLetters.count(c)) {
+		if (c < 'A' || c > 'z')
+			continue;
+		if (!countLetters.count(c))
+		{
 			countLetters[c] = 1;
-		} else {
+		}
+		else
+		{
 			countLetters[c] += 1;
 		}
 	}
-	for (auto const& [key, val] : countLetters) {
+	for (auto const &[key, val] : countLetters)
+	{
 		result = result + key + to_string(val);
 	}
 	return result;
@@ -73,52 +85,63 @@ void Controller::handleServerInput(uint16_t fd, char *buffer)
 {
 	cout << "Controller: got input '" << buffer << "'from " << fd << endl;
 	prs.parse(buffer);
-	for(string i : prs.values)
+	for (string i : prs.values)
 	{
 		cout << "Controller::handleServerInput -> for: input: '" << i << "'.\n";
 	}
 
-
-	//get the first argument name
+	// get the first argument name
 	string key;
 	try
 	{
 		key = prs.values.at(0);
 	}
-	catch(out_of_range oor)
+	catch (out_of_range oor)
 	{
 		cerr << "no action" << endl;
 	}
 
-	//look it up in the handlers map
+	// look it up in the handlers map
 	Controller::handler h = NULL;
 
 	char buf[100];
-	if (key == "connectionsNumber") {
+	if (key == "connectionsNumber")
+	{
 		sprintf(buf, "connectionsNumber: %d", connectionsNumber);
-	} else if (key == "parse" && prs.values.size() == 2) {
+	}
+	else if (key == "parse" && prs.values.size() == 2)
+	{
 		sprintf(buf, "parsedString: %s", getStringStats(prs.values.at(1)).c_str());
-	} else if (key == "put" && prs.values.size() == 3) {
+	}
+	else if (key == "put" && prs.values.size() == 3)
+	{
 		uint16_t recieverFd = stoi(prs.values.at(1));
 		MsgData msgData;
 		msgData.msg = prs.values.at(2);
 		msgData.sender = fd;
-		msgData.receiver  = recieverFd;
+		msgData.receiver = recieverFd;
 		messagesDataBase.push_back(msgData);
 		sprintf(buf, "message sent to %d", recieverFd);
-	} else if (key == "get") {
+	}
+	else if (key == "get")
+	{
 		uint16_t senderFd = 0;
 		string msg = "";
 		getMessage(fd, senderFd, msg);
-		if (!msg.empty()) {
+		if (!msg.empty())
+		{
 			sprintf(buf, "new msg from %d: %s", senderFd, msg.c_str());
-		} else {
+		}
+		else
+		{
 			sprintf(buf, "no messages");
 		}
-	} else {
+	}
+	else
+	{
 		sprintf(buf, "not valid request");
 	}
-	
+
 	send(fd, buf, strlen(buf), 0);
 
 	prs.values.clear();
@@ -126,7 +149,7 @@ void Controller::handleServerInput(uint16_t fd, char *buffer)
 
 void Controller::addHandler(string key, Controller::handler cb)
 {
-	handlers.insert(pair<string,Controller::handler>(key,cb));
+	handlers.insert(pair<string, Controller::handler>(key, cb));
 }
 
 void Controller::removeHandler(string key)
