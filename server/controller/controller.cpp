@@ -107,7 +107,6 @@ void Controller::handleServerInput(uint16_t fd, char *buffer)
 		messagesDataBase.push_back(msgData);
 		sprintf(buf, "message sent to %d", recieverFd);
 	} else if (key == "get") {
-		// uint16_t senderFd = stoi(prs.values.at(1));
 		uint16_t senderFd = 0;
 		string msg = "";
 		getMessage(fd, senderFd, msg);
