@@ -71,7 +71,7 @@ Awaiting server response...
 Server: no messages
 ```
 
-5. Если сервер недорступен то идут попытки подключиться
+5. Если сервер недорступен, то идут попытки подключиться
 
 ```
 Error connecting to socket!
